@@ -38,10 +38,10 @@ private:
     hpx::distributed_object< std::tuple< std::int32_t, std::vector<std::string> > > args;
 
 public:
-    using communication_pattern = upcxx::utils::collectives::tree_binomial;
+    using communication_pattern = hpx::utils::collectives::tree_binomial;
     using blocking_policy = BlockingPolicy;
 
-    reduce(const std::string agas_name, const std::int64_t root_=upcxx::rank_me()) :
+    reduce(const std::string agas_name, const std::int64_t root_=hpx::get_locality_id()) :
         root(root_),
         mask(0x1),
         args{agas_name, std::make_tuple(0, std::vector<std::string>{})} {

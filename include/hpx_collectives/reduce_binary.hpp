@@ -37,10 +37,10 @@ private:
     hpx::distributed_object< std::tuple<std::int32_t, std::int32_t, std::string, std::string> > args;
 
 public:
-    using communication_pattern = upcxx::utils::collectives::tree_binary;
+    using communication_pattern = hpx::utils::collectives::tree_binary;
     using blocking_policy = BlockingPolicy;
 
-    reduce(const std::string agas_name, const std::int64_t root_=upcxx::rank_me()) :
+    reduce(const std::string agas_name, const std::int64_t root_=hpx::get_locality_id()) :
         root(root_),
         cas_count(0),
         args{agas_name, std::make_tuple(0, 0, std::string{}, std::string{})} {

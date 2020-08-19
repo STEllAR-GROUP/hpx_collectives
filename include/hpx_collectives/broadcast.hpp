@@ -25,6 +25,6 @@ public:
 
 };
 
-} /* end namespace collectives */ } /* end namespace utils */ } /* end namespace upcxx */
+} /* end namespace collectives */ } /* end namespace utils */ } /* end namespace hpx */
 
 #endif

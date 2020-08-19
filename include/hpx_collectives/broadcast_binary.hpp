@@ -39,7 +39,7 @@ private:
     distributed_object< std::tuple< std::int32_t , std::string > > args;
 
 public:
-    using communication_pattern = upcxx::utils::collectives::tree_binary;
+    using communication_pattern = hpx::utils::collectives::tree_binary;
     using blocking_policy = BlockingPolicy;
 
     broadcast(const std::string agas_name, const std::int64_t root_=0) :

@@ -53,7 +53,7 @@ public:
         rel_rank = (rank_me+root_) % rank_n;
         left = (2*rel_rank) + 1;
         right = (2*rel_rank) + 2;
-        cas_count = ( left < upcxx::rank_n() ) + ( right < upcxx::rank_n() );
+        cas_count = ( left < rank_n ) + ( right < rank_n );
     }
 
     template<typename InputIterator, typename OutputIterator>

@@ -23,8 +23,8 @@ public:
     void operator()(InputIterator input_beg, InputIterator input_end, OutputIterator out_beg);
 };
 
-} /* end namespace collectives */ } /* end namespace utils */ } /* end namespace upcxx */
+} /* end namespace collectives */ } /* end namespace utils */ } /* end namespace hpx */
 
-// https://github.com/pmodels/mpich/blob/master/src/mpi/coll/reduce/reduce_intra_binomial.c
+// inspired by https://github.com/pmodels/mpich/blob/master/src/mpi/coll/reduce/reduce_intra_binomial.c
 
 #endif

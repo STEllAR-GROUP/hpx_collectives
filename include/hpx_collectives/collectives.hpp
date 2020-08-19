@@ -77,36 +77,36 @@ public:
 
 // broadcast
 //
-using nonblocking_binomial_broadcast = upcxx::utils::collectives::scalar_collective<upcxx::utils::collectives::broadcast<upcxx::utils::collectives::tree_binomial, upcxx::utils::collectives::nonblocking, upcxx::utils::collectives::serialization::backend>>;
-using blocking_binomial_broadcast = upcxx::utils::collectives::scalar_collective<upcxx::utils::collectives::broadcast<upcxx::utils::collectives::tree_binomial, upcxx::utils::collectives::blocking, upcxx::utils::collectives::serialization::backend>>;
+using nonblocking_binomial_broadcast = hpx::utils::collectives::scalar_collective<hpx::utils::collectives::broadcast<hpx::utils::collectives::tree_binomial, hpx::utils::collectives::nonblocking, hpx::utils::collectives::serialization::backend>>;
+using blocking_binomial_broadcast = hpx::utils::collectives::scalar_collective<hpx::utils::collectives::broadcast<hpx::utils::collectives::tree_binomial, hpx::utils::collectives::blocking, hpx::utils::collectives::serialization::backend>>;
 
-using nonblocking_binary_broadcast = upcxx::utils::collectives::scalar_collective<upcxx::utils::collectives::broadcast<upcxx::utils::collectives::tree_binary, upcxx::utils::collectives::nonblocking, upcxx::utils::collectives::serialization::backend>>;
-using blocking_binary_broadcast = upcxx::utils::collectives::scalar_collective<upcxx::utils::collectives::broadcast<upcxx::utils::collectives::tree_binary, upcxx::utils::collectives::blocking, upcxx::utils::collectives::serialization::backend>>;
+using nonblocking_binary_broadcast = hpx::utils::collectives::scalar_collective<hpx::utils::collectives::broadcast<hpx::utils::collectives::tree_binary, hpx::utils::collectives::nonblocking, hpx::utils::collectives::serialization::backend>>;
+using blocking_binary_broadcast = hpx::utils::collectives::scalar_collective<hpx::utils::collectives::broadcast<hpx::utils::collectives::tree_binary, hpx::utils::collectives::blocking, hpx::utils::collectives::serialization::backend>>;
 
 // scatter
 //
-using nonblocking_binomial_scatter = upcxx::utils::collectives::iterable_collective<upcxx::utils::collectives::scatter<upcxx::utils::collectives::tree_binomial, upcxx::utils::collectives::nonblocking, upcxx::utils::collectives::serialization::backend>>;
-using blocking_binomial_scatter = upcxx::utils::collectives::iterable_collective<upcxx::utils::collectives::scatter<upcxx::utils::collectives::tree_binomial, upcxx::utils::collectives::blocking, upcxx::utils::collectives::serialization::backend>>;
+using nonblocking_binomial_scatter = hpx::utils::collectives::iterable_collective<hpx::utils::collectives::scatter<hpx::utils::collectives::tree_binomial, hpx::utils::collectives::nonblocking, hpx::utils::collectives::serialization::backend>>;
+using blocking_binomial_scatter = hpx::utils::collectives::iterable_collective<hpx::utils::collectives::scatter<hpx::utils::collectives::tree_binomial, hpx::utils::collectives::blocking, hpx::utils::collectives::serialization::backend>>;
 
-using nonblocking_binary_scatter = upcxx::utils::collectives::iterable_collective<upcxx::utils::collectives::scatter<upcxx::utils::collectives::tree_binary, upcxx::utils::collectives::nonblocking, upcxx::utils::collectives::serialization::backend>>;
-using blocking_binary_scatter = upcxx::utils::collectives::iterable_collective<upcxx::utils::collectives::scatter<upcxx::utils::collectives::tree_binary, upcxx::utils::collectives::blocking, upcxx::utils::collectives::serialization::backend>>;
+using nonblocking_binary_scatter = hpx::utils::collectives::iterable_collective<hpx::utils::collectives::scatter<hpx::utils::collectives::tree_binary, hpx::utils::collectives::nonblocking, hpx::utils::collectives::serialization::backend>>;
+using blocking_binary_scatter = hpx::utils::collectives::iterable_collective<hpx::utils::collectives::scatter<hpx::utils::collectives::tree_binary, hpx::utils::collectives::blocking, hpx::utils::collectives::serialization::backend>>;
 
 // gather
 //
-using nonblocking_binary_gather = upcxx::utils::collectives::iterable_collective<upcxx::utils::collectives::gather<upcxx::utils::collectives::tree_binary, upcxx::utils::collectives::nonblocking, upcxx::utils::collectives::serialization::backend>>;
-using blocking_binary_gather = upcxx::utils::collectives::iterable_collective<upcxx::utils::collectives::gather<upcxx::utils::collectives::tree_binary, upcxx::utils::collectives::blocking, upcxx::utils::collectives::serialization::backend>>;
+using nonblocking_binary_gather = hpx::utils::collectives::iterable_collective<hpx::utils::collectives::gather<hpx::utils::collectives::tree_binary, hpx::utils::collectives::nonblocking, hpx::utils::collectives::serialization::backend>>;
+using blocking_binary_gather = hpx::utils::collectives::iterable_collective<hpx::utils::collectives::gather<hpx::utils::collectives::tree_binary, hpx::utils::collectives::blocking, hpx::utils::collectives::serialization::backend>>;
 
-using nonblocking_binomial_gather = upcxx::utils::collectives::iterable_collective<upcxx::utils::collectives::gather<upcxx::utils::collectives::tree_binomial, upcxx::utils::collectives::nonblocking, upcxx::utils::collectives::serialization::backend>>;
-using blocking_binomial_gather = upcxx::utils::collectives::iterable_collective<upcxx::utils::collectives::gather<upcxx::utils::collectives::tree_binomial, upcxx::utils::collectives::blocking, upcxx::utils::collectives::serialization::backend>>;
+using nonblocking_binomial_gather = hpx::utils::collectives::iterable_collective<hpx::utils::collectives::gather<hpx::utils::collectives::tree_binomial, hpx::utils::collectives::nonblocking, hpx::utils::collectives::serialization::backend>>;
+using blocking_binomial_gather = hpx::utils::collectives::iterable_collective<hpx::utils::collectives::gather<hpx::utils::collectives::tree_binomial, hpx::utils::collectives::blocking, hpx::utils::collectives::serialization::backend>>;
 
 // reduce
 //
-using nonblocking_binary_reduce = upcxx::utils::collectives::iterable_collective<upcxx::utils::collectives::reduce<upcxx::utils::collectives::tree_binary, upcxx::utils::collectives::nonblocking, upcxx::utils::collectives::serialization::backend>>;
-using blocking_binary_reduce = upcxx::utils::collectives::iterable_collective<upcxx::utils::collectives::reduce<upcxx::utils::collectives::tree_binary, upcxx::utils::collectives::blocking, upcxx::utils::collectives::serialization::backend>>;
+using nonblocking_binary_reduce = hpx::utils::collectives::iterable_collective<hpx::utils::collectives::reduce<hpx::utils::collectives::tree_binary, hpx::utils::collectives::nonblocking, hpx::utils::collectives::serialization::backend>>;
+using blocking_binary_reduce = hpx::utils::collectives::iterable_collective<hpx::utils::collectives::reduce<hpx::utils::collectives::tree_binary, hpx::utils::collectives::blocking, hpx::utils::collectives::serialization::backend>>;
 
-using nonblocking_binomial_reduce = upcxx::utils::collectives::iterable_collective<upcxx::utils::collectives::reduce<upcxx::utils::collectives::tree_binomial, upcxx::utils::collectives::nonblocking, upcxx::utils::collectives::serialization::backend>>;
-using blocking_binomial_reduce = upcxx::utils::collectives::iterable_collective<upcxx::utils::collectives::reduce<upcxx::utils::collectives::tree_binomial, upcxx::utils::collectives::blocking, upcxx::utils::collectives::serialization::backend>>;
+using nonblocking_binomial_reduce = hpx::utils::collectives::iterable_collective<hpx::utils::collectives::reduce<hpx::utils::collectives::tree_binomial, hpx::utils::collectives::nonblocking, hpx::utils::collectives::serialization::backend>>;
+using blocking_binomial_reduce = hpx::utils::collectives::iterable_collective<hpx::utils::collectives::reduce<hpx::utils::collectives::tree_binomial, hpx::utils::collectives::blocking, hpx::utils::collectives::serialization::backend>>;
 
-} /* end namespace collectives */ } /* end namespace utils */ } /* end namespace upcxx */
+} /* end namespace collectives */ } /* end namespace utils */ } /* end namespace hpx */
 
 #endif

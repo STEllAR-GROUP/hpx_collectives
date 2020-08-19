@@ -71,6 +71,6 @@ struct is_topology_hypercube<topology_hypercube> : public std::true_type {
 
 
 
-} /* end namespace collectives */ } /* end namespace utils */ } /* end namespace upcxx */
+} /* end namespace collectives */ } /* end namespace utils */ } /* end namespace hpx */
 
 #endif
