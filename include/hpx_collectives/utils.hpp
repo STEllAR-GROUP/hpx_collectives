@@ -4,10 +4,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 #pragma once
-#ifndef __UPCXX_COLLECTIVES_UTILS_H__
-#define __UPCXX_COLLECTIVES_UTILS_H__
+#ifndef __HPX_COLLECTIVES_UTILS_H__
+#define __HPX_COLLECTIVES_UTILS_H__
 
-namespace upcxx { namespace utils { namespace collectives { namespace utils {
+namespace hpx { namespace utils { namespace collectives { namespace utils {
 
 #define STRONG 0
 #define WEAK 1
@@ -58,7 +58,7 @@ static inline int backoff(const int attempt, const int base, const int cap) {
 /* Clang provides a full-barrier atomic exchange - use it if available. */
 
 #define atomic_xchange(object, object_value, value) \
-    upcxx::utils::collectives::utils::atomic_cmp_ex(object, object_value, value)
+    hpx::utils::collectives::utils::atomic_cmp_ex(object, object_value, value)
 //    __sync_swap(object, value)
 #endif
 

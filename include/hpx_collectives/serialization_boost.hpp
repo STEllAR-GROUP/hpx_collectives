@@ -1,6 +1,11 @@
+//  Copyright (c) 2020 Christopher Taylor
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
 #pragma once
-#ifndef __UPCXX_COLLECTIVES_SERIALIZER_BOOST__
-#define __UPCXX_COLLECTIVES_SERIALIZER_BOOST__
+#ifndef __HPX_COLLECTIVES_SERIALIZER_BOOST__
+#define __HPX_COLLECTIVES_SERIALIZER_BOOST__
 
 #include <type_traits>
 #include <sstream>
@@ -10,7 +15,7 @@
     #include <boost/archive/binary_iarchive.hpp>
 #endif
 
-namespace upcxx { namespace utils { namespace collectives { namespace serialization {
+namespace hpx { namespace utils { namespace collectives { namespace serialization {
 
 #ifdef BOOST
 
@@ -35,7 +40,7 @@ struct is_boost : public std::false_type {
 };
 
 template<>
-struct is_boost<upcxx::utils::collectives::serialization::boost> : public std::true_type {
+struct is_boost<hpx::utils::collectives::serialization::boost> : public std::true_type {
 };
 
 } } } } // end namespaces
