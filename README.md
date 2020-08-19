@@ -3,7 +3,7 @@
 <!--   Distributed under the Boost Software License, Version 1.0. (See accompanying -->
 <!--   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)        -->
 
-# Collective Communication Primitives for HPX
+# Collective Communication Primitives for STE||AR HPX
 
 Project details [here](http://www.github.com/ct-clmsn/hpx_collectives/).
 
