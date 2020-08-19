@@ -7,11 +7,11 @@
 
 Project details [here](http://www.github.com/ct-clmsn/hpx_collectives/).
 
-This project implements collective operations for HPX using single-sided
-communications. The project is 'header-only'. Serialization routines are
-third-party provided and will require a user application to link to a
-library and a compile-time-flag to tell the header files which serializer
-to utilize.
+This project implements collective operations for STE||AR HPX using
+single-sided communications. The project is 'header-only'. Serialization
+routines are third-party provided and will require a user application to
+link to a library and a compile-time-flag to tell the header files which
+serializer to utilize.
 
 ### License
 
