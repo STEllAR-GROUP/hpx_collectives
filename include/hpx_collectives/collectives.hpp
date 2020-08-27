@@ -2,7 +2,7 @@
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//   
+//
 #pragma once
 #ifndef __HPX_COLLECTIVES_HPP__
 #define __HPX_COLLECTIVES_HPP__
@@ -22,6 +22,9 @@
 #include "reduce_binary.hpp"
 #include "reduce_binomial.hpp"
 
+#include <cstdint>
+#include <string>
+
 namespace hpx { namespace utils { namespace collectives {
 
 template<typename Operation>
@@ -29,15 +32,17 @@ class scalar_collective {
 
 private:
     const std::int64_t root;
+    const std::string agas_name;
 
 public:
-    scalar_collective(const std::int64_t root_=0) :
-        root(root_) {
+    scalar_collective(const std::string& agas_name_, const std::int64_t root_=0) :
+        root(root_),
+        agas_name(agas_name_) {
     }
 
     template<typename DataType>
     void operator()(DataType & data) {
-        Operation op{root};
+        Operation op{agas_name, root};
         op(data);
     }
 };
@@ -47,15 +52,17 @@ class iterable_collective {
 
 private:
     const std::int64_t root;
+    const std::string agas_name;
 
 public:
-    iterable_collective(const std::int64_t root_=0) :
-        root(root_) {
+    iterable_collective(const std::string& agas_name_, const std::int64_t root_=0) :
+        root(root_),
+        agas_name(agas_name_) {
     }
 
     template<typename InputIter, typename OutputIter>
     void operator()(InputIter input_beg, InputIter input_end, OutputIter output_beg) {
-        Operation op{root};
+        Operation op{agas_name, root};
         op(input_beg, input_end, output_beg);
     }
 

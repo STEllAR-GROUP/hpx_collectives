@@ -7,22 +7,24 @@
 #ifndef __HPX_BROADCAST_BINOMIAL_HPP__
 #define __HPX_BROADCAST_BINOMIAL_HPP__
 
+#if defined(HPX_HAVE_UNISTD_H)
 #include <unistd.h>
+#endif
+#include <cstdint>
 #include <string>
 #include <sstream>
+#include <utility>
 
 #include <hpx/include/async.hpp>
-#include <hpx/lcos/barrier.hpp>
+#include <hpx/barrier.hpp>
 #include <hpx/lcos/distributed_object.hpp>
 
-#include "collective_traits.hpp" 
+#include "collective_traits.hpp"
 #include "serialization.hpp"
 #include "broadcast.hpp"
 #include "utils.hpp"
 
 using hpx::lcos::distributed_object;
-
-REGISTER_DISTRIBUTED_OBJECT_PART(std::tuple<std::int32_t, std::string>);
 
 namespace hpx { namespace utils { namespace collectives {
 
@@ -35,20 +37,20 @@ class broadcast< tree_binomial, BlockingPolicy, Serialization > {
 
 private:
     const std::int64_t root;
-    hpx::distributed_object< std::tuple<std::int32_t, std::string> > args;
+    hpx::lcos::distributed_object<broadcast_tuple_type> args;
 
 public:
     using communication_pattern = hpx::utils::collectives::tree_binomial;
     using blocking_policy = BlockingPolicy;
 
-    broadcast(const std::string agas_name, const std::int64_t root_=0) :
+    broadcast(const std::string& agas_name, const std::int64_t root_=0) :
         root(root_),
         args{agas_name, std::make_tuple(0, std::string{})} {
     }
 
     template<typename DataType>
     void operator()(DataType & data) {
-        const std::int64_t rank_n = hpx::final_all_localities().size();
+        const std::int64_t rank_n = hpx::get_num_localities(hpx::launch::sync);
 
         // https://legacy.cs.indiana.edu/classes/b673-bram/Notes/mpi3.html
         //
@@ -76,9 +78,9 @@ public:
 
                 hpx::async(
                     (rank_me + k),
-                    [](hpx::distributed_object< std::tuple<std::int32_t, std::string> > & args_, std::string serialized_value) {
+                    [](hpx::lcos::distributed_object<broadcast_tuple_type> & args_, std::string serialized_value) {
                         std::get<1>(*args_).resize(serialized_value.size());
-                        std::get<1>(*args_).insert(0, serialized_value);
+                        std::get<1>(*args_).insert(0, std::move(serialized_value));
                         atomic_xchange( &std::get<0>(*args_), 0, 1 );
                     }, args, Serialization::get_buffer(send_buffer)
                 );
@@ -100,7 +102,7 @@ public:
         } // end for loop
 
         if constexpr(is_blocking<BlockingPolicy>()) {
-            hpx::lcos::barrier b("wait_for_completion", hpx::final_all_localities().size(), hpx::get_locality_id());
+            hpx::lcos::barrier b("wait_for_completion", hpx::get_num_localities(hpx::launch::sync), hpx::get_locality_id());
             b.wait(); // make sure communications terminate properly
         }
 

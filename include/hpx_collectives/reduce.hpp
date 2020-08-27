@@ -7,7 +7,10 @@
 #ifndef __HPX_REDUCE_HPP__
 #define __HPX_REDUCE_HPP__
 
-#include "collective_traits.hpp" 
+#include "collective_traits.hpp"
+#include "hpx_collectives/tuple_types.hpp"
+
+#include <cstdint>
 
 namespace hpx { namespace utils { namespace collectives {
 
@@ -24,6 +27,9 @@ public:
     void operator()(InputIterator input_beg, InputIterator input_end, typename std::iterator_traits<InputIterator>::value_type init, BinaryOp op, typename std::iterator_traits<InputIterator>::value_type & output);
 
 };
+
+using binary_reduce_tuple_type = int_int_string_string_tuple_type;
+using binomial_reduce_tuple_type = int_vector_string_tuple_type;
 
 } /* end namespace collectives */ } /* end namespace utils */ } /* end namespace hpx */
 

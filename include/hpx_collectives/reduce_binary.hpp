@@ -12,10 +12,12 @@
 #include <sstream>
 #include <iterator>
 #include <numeric>
+#if defined(HPX_HAVE_UNISTD_H)
 #include <unistd.h>
+#endif
 
 #include <hpx/include/async.hpp>
-#include <hpx/lcos/barrier.hpp>
+#include <hpx/barrier.hpp>
 #include <hpx/lcos/distributed_object.hpp>
 
 #include "collective_traits.hpp"
@@ -34,7 +36,7 @@ class reduce<tree_binary, BlockingPolicy, Serialization > {
 private:
     std::int64_t root;
     std::int64_t cas_count;
-    hpx::distributed_object< std::tuple<std::int32_t, std::int32_t, std::string, std::string> > args;
+    hpx::lcos::distributed_object<binary_reduce_tuple_type> args;
 
 public:
     using communication_pattern = hpx::utils::collectives::tree_binary;
@@ -133,7 +135,7 @@ public:
                     value_oa << result_local;
                     hpx::async(
                         parent,
-                        [](hpx::distributed_object< std::tuple<std::int32_t, std::int32_t, std::string, std::string> > & args_, std::string data_) {
+                        [](hpx::lcos::distributed_object<binary_reduce_tuple_type> & args_, std::string data_) {
                             std::get<3>(*args_).append(data_);
                             atomic_xchange( &std::get<1>(*args_), 0, 1 );
                         }, args, Serialization::get_buffer(value_buffer)
@@ -143,7 +145,7 @@ public:
                     value_oa << result_local;
                     hpx::async(
                         parent,
-                        [](hpx::distributed_object< std::tuple<std::int32_t, std::int32_t, std::string, std::string> > & args_, std::string data_) {
+                        [](hpx::lcos::distributed_object<binary_reduce_tuple_type> & args_, std::string data_) {
                             std::get<2>(*args_).append(data_);
                             atomic_xchange( &std::get<0>(*args_), 0, 1 );
                         }, args, Serialization::get_buffer(value_buffer)
@@ -194,7 +196,7 @@ public:
                 if(is_even) {
                     hpx::async(
                         parent,
-                        [](hpx::distributed_object< std::tuple<std::int32_t, std::int32_t, std::string, std::string> > & args_, std::string data_) {
+                        [](hpx::lcos::distributed_object<binary_reduce_tuple_type> & args_, std::string data_) {
                             std::get<3>(*args_).append(data_);
                             atomic_xchange( &std::get<1>(*args_), 0, 1 );
                         }, args, Serialization::get_buffer(value_buffer)
@@ -203,7 +205,7 @@ public:
                 else {
                     hpx::async(
                         parent,
-                        [](hpx::distributed_object< std::tuple<std::int32_t, std::int32_t, std::string, std::string> > & args_, std::string data_) {
+                        [](hpx::lcos::distributed_object<binary_reduce_tuple_type> & args_, std::string data_) {
                             std::get<2>(*args_).append(data_);
                             atomic_xchange( &std::get<0>(*args_), 0, 1 );
                         }, args, Serialization::get_buffer(value_buffer)
@@ -213,7 +215,7 @@ public:
         } // end non-root else
 
         if constexpr(is_blocking<BlockingPolicy>()) {
-            hpx::lcos::barrier b("wait_for_completion", hpx::final_all_localities().size(), hpx::get_locality_id());
+            hpx::lcos::barrier b("wait_for_completion", hpx::get_num_localities(hpx::launch::sync), hpx::get_locality_id());
             b.wait(); // make sure communications terminate properly
         }
 

@@ -7,23 +7,24 @@
 #ifndef __HPX_GATHER_BINARY_HPP__
 #define __HPX_GATHER_BINARY_HPP__
 
+#include <cstdint>
+#include <iterator>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
-#include <iterator>
+#if defined(HPX_HAVE_UNISTD_H)
 #include <unistd.h>
+#endif
 
 #include <hpx/include/async.hpp>
-#include <hpx/lcos/barrier.hpp>
+#include <hpx/barrier.hpp>
 #include <hpx/lcos/distributed_object.hpp>
 
-#include "collective_traits.hpp" 
+#include "collective_traits.hpp"
 #include "gather.hpp"
 #include "serialization.hpp"
 
 using hpx::lcos::distributed_object;
-
-REGISTER_DISTRIBUTED_OBJECT_PART(std::tuple<std::int32_t, std::string>);
 
 namespace hpx { namespace utils { namespace collectives {
 
@@ -38,7 +39,7 @@ private:
     std::int64_t root;
     std::int64_t cas_count;
     std::int64_t rel_rank;
-    hpx::distributed_object< std::tuple< std::int32_t, std::int32_t, std::vector<std::string>, std::vector<std::string> > > args;
+    hpx::lcos::distributed_object<binary_gather_tuple_type> args;
 
 public:
     using communication_pattern = hpx::utils::collectives::tree_binary;
@@ -133,7 +134,7 @@ public:
                 if(is_even) {
                     hpx::async(
                         parent,
-                        [](hpx::distributed_object< std::tuple<std::int32_t, std::int32_t, std::vector<std::string>, std::vector<std::string>> > & args_, std::string data_) {
+                        [](hpx::lcos::distributed_object<binary_gather_tuple_type> & args_, std::string data_) {
                             std::get<3>(*args_).push_back(data_);
                             atomic_xchange( &std::get<1>(*args_), 0, 1 );
                         }, args, Serialization::get_buffer(value_buffer)
@@ -142,7 +143,7 @@ public:
                 else {
                     hpx::async(
                         parent,
-                        [](hpx::distributed_object< std::tuple<std::int32_t, std::int32_t, std::vector<std::string>, std::vector<std::string>> > & args_, std::string data_) {
+                        [](hpx::lcos::distributed_object<binary_gather_tuple_type> & args_, std::string data_) {
                             std::get<2>(*args_).push_back(data_);
                             atomic_xchange( &std::get<0>(*args_), 0, 1 );
                         }, args, Serialization::get_buffer(value_buffer)
@@ -177,7 +178,7 @@ public:
                 if(is_even) {
                     hpx::async(
                         parent,
-                        [](hpx::distributed_object< std::tuple< std::int32_t, std::int32_t, std::vector<std::string>, std::vector<std::string> > > & args_, std::vector<std::string> data_) {
+                        [](hpx::distributed_object<binary_gather_tuple_type> & args_, std::vector<std::string> data_) {
                             std::get<3>(*args_).reserve(std::get<3>(*args_).size() + data_.size());
                             std::get<3>(*args_).insert(std::get<3>(*args_).end(), data_.begin(), data_.end());
                             atomic_xchange( &std::get<1>(*args_), 0, 1 );
@@ -187,7 +188,7 @@ public:
                 else {
                     hpx::async(
                         parent,
-                        [](hpx::distributed_object< std::tuple< std::int32_t, std::int32_t, std::vector<std::string>, std::vector<std::string> > > & args_, std::vector<std::string> data_) {
+                        [](hpx::distributed_object<binary_gather_tuple_type> & args_, std::vector<std::string> data_) {
                             std::get<2>(*args_).reserve(std::get<2>(*args_).size() + data_.size());
                             std::get<2>(*args_).insert(std::get<2>(*args_).end(), data_.begin(), data_.end());
                             atomic_xchange( &std::get<0>(*args_), 0, 1 );
@@ -198,7 +199,7 @@ public:
         } // end non-root else
 
         if constexpr(is_blocking<BlockingPolicy>()) {
-            hpx::lcos::barrier b("wait_for_completion", hpx::final_all_localities().size(), hpx::get_locality_id());
+            hpx::lcos::barrier b("wait_for_completion", hpx::get_num_localities(hpx::launch::sync), hpx::get_locality_id());
             b.wait(); // make sure communications terminate properly
         }
 

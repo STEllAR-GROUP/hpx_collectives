@@ -10,10 +10,12 @@
 #include <string>
 #include <sstream>
 #include <iterator>
+#if defined(HPX_HAVE_UNISTD_H)
 #include <unistd.h>
+#endif
 
 #include <hpx/include/async.hpp>
-#include <hpx/lcos/barrier.hpp>
+#include <hpx/barrier.hpp>
 #include <hpx/lcos/distributed_object.hpp>
 
 #include "collective_traits.hpp"
@@ -32,11 +34,11 @@ class scatter<tree_binomial, BlockingPolicy, Serialization> {
 
 private:
     std::int64_t root;
-    hpx::distributed_object< std::tuple<std::int32_t, std::string> > args;
+    hpx::lcos::distributed_object<binomial_scatter_tuple_type> args;
 
 public:
     using communication_pattern = tree_binomial;
-    using blocking_policy = BlockingPolicy;                                                                                                                                                                         
+    using blocking_policy = BlockingPolicy;
     scatter(const std::string agas_name, const std::int64_t root_=0) :
         root(root_),
         args{agas_name, std::make_tuple(0, std::string{})} {
@@ -99,7 +101,7 @@ public:
 
                     for(auto sitr = sitr_beg; sitr != sitr_end; sitr++) {
                         if( ((sitr - sitr_beg) % block_size) == 0 ) {
-                            value_oa << block_size; 
+                            value_oa << block_size;
                         }
                         value_oa << (*sitr);
                     }
@@ -116,7 +118,7 @@ public:
 
                 hpx::async(
                     (rank_me + k),
-                    [](hpx::distributed_object< std::tuple<std::int32_t, std::string> > & args_, std::string data_) {
+                    [](hpx::lcos::distributed_object<binomial_scatter_tuple_type> & args_, std::string data_) {
                         std::get<1>(*args_).resize(data_.size());
                         std::get<1>(*args_).insert(0, data_);
 
@@ -149,7 +151,7 @@ public:
         } // end for loop
 
         if constexpr(is_blocking<BlockingPolicy>()) {
-            hpx::lcos::barrier b("wait_for_completion", hpx::final_all_localities().size(), hpx::get_locality_id());
+            hpx::lcos::barrier b("wait_for_completion", hpx::get_num_localities(hpx::launch::sync), hpx::get_locality_id());
             b.wait(); // make sure communications terminate properly
         }
 

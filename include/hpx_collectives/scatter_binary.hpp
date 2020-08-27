@@ -13,10 +13,12 @@
 #include <numeric>
 #include <algorithm>
 #include <vector>
+#if defined(HPX_HAVE_UNISTD_H)
 #include <unistd.h>
+#endif
 
 #include <hpx/include/async.hpp>
-#include <hpx/lcos/barrier.hpp>
+#include <hpx/barrier.hpp>
 #include <hpx/lcos/distributed_object.hpp>
 
 #include "collective_traits.hpp"
@@ -34,11 +36,11 @@ class scatter<tree_binary, BlockingPolicy, Serializer> {
 
 private:
     std::int64_t root, cas_count, rel_rank, left, right;
-    hpx::distributed_object< std::tuple<std::int32_t, std::vector<std::string> > > args;
+    hpx::lcos::distributed_object<binary_scatter_tuple_type> args;
 
 public:
     using communication_pattern = tree_binary;
-    using blocking_policy = BlockingPolicy;                                                                                                                                                                         
+    using blocking_policy = BlockingPolicy;
     scatter(const std::string agas_name, const std::int64_t root_=0) :
         root(root_),
         cas_count(0),
@@ -62,7 +64,7 @@ public:
         //
         using itr_value_type_t = typename std::iterator_traits<InputIterator>::value_type;
 
-        const auto data_n = static_cast<std::int64_t>(input_end - input_beg); 
+        const auto data_n = static_cast<std::int64_t>(input_end - input_beg);
         const auto block_size = data_n /
             static_cast<std::int64_t>(upcxx::rank_n());
 
@@ -112,14 +114,14 @@ public:
 
                 pos += block_size;
             }
-    
+
             for(std::int64_t i = 0; i < cas_count; ++i) {
- 
+
                 const std::int64_t lr_rank = (i == 0) ? left : right;
                 auto & value_buffers = (i == 0) ? lvalue_buffers : rvalue_buffers;
                 hpx::async(
                     lr_rank,
-                    [](hpx::distributed_object< std::tuple<std::int32_t, std::vector<std::string> > > & args_, std::vector<std::string> data_) {
+                    [](hpx::lcos::distributed_object<binary_scatter_tuple_type> & args_, std::vector<std::string> data_) {
                         std::get<1>(*args_).resize(data_.size());
                         std::copy(data_.begin(), data_.end(), std::get<1>(*args_).begin());
 
@@ -144,7 +146,7 @@ public:
             }
 
             for(std::int64_t i = 0; i < cas_count; ++i) {
- 
+
                 const auto parent = ( i == 0 ) ? left : right;
                 std::vector<std::string> send_buffer{Serializer::get_buffer(recv_buffer)};
                 hpx::async(
@@ -154,13 +156,13 @@ public:
                         std::copy(data_.begin(), data_.end(), std::get<1>(*args_).begin());
 
                         atomic_xchange( &std::get<0>(*args_), 0, 1 );
-                    }, args, send_buffer 
+                    }, args, send_buffer
                 );
             }
         }
 
         if constexpr(is_blocking<BlockingPolicy>()) {
-            hpx::lcos::barrier b("wait_for_completion", hpx::final_all_localities().size(), hpx::get_locality_id());
+            hpx::lcos::barrier b("wait_for_completion", hpx::get_num_localities(hpx::launch::sync), hpx::get_locality_id());
             b.wait(); // make sure communications terminate properly
         }
     }

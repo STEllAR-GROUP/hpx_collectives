@@ -7,23 +7,25 @@
 #ifndef __HPX_BROADCAST_BINARY_HPP__
 #define __HPX_BROADCAST_BINARY_HPP__
 
-#include <string>
-#include <vector>
-#include <sstream>
+#include <cstdint>
 #include <iterator>
+#include <sstream>
+#include <string>
+#include <tuple>
+#include <vector>
+#if defined(HPX_HAVE_UNISTD_H)
 #include <unistd.h>
+#endif
 
 #include <hpx/include/async.hpp>
-#include <hpx/lcos/barrier.hpp>
+#include <hpx/barrier.hpp>
 #include <hpx/lcos/distributed_object.hpp>
 
-#include "collective_traits.hpp" 
+#include "collective_traits.hpp"
 #include "serialization.hpp"
 #include "broadcast.hpp"
 
 using hpx::lcos::distributed_object;
-
-REGISTER_DISTRIBUTED_OBJECT_PART(std::tuple<std::int32_t, std::string>);
 
 namespace hpx { namespace utils { namespace collectives {
 
@@ -36,7 +38,7 @@ class broadcast<tree_binary, BlockingPolicy, Serialization> {
 
 private:
     std::int64_t root, cas_count, rel_rank, left, right;
-    distributed_object< std::tuple< std::int32_t , std::string > > args;
+    distributed_object<broadcast_tuple_type> args;
 
 public:
     using communication_pattern = hpx::utils::collectives::tree_binary;
@@ -50,7 +52,7 @@ public:
         right(0),
         args{agas_name, std::make_tuple(0, std::string{})} {
 
-        const auto rank_n = hpx::final_all_localities().size();
+        const auto rank_n = hpx::get_num_localities(hpx::launch::sync);
 
         rel_rank = (hpx::get_locality_id() + root_) % rank_n;
         left = (2*rel_rank) + 1;
@@ -61,7 +63,7 @@ public:
     template<typename DataType>
     void operator()(DataType & data) {
 
-        const std::int64_t rank_n = hpx::final_all_localities().size();
+        const std::int64_t rank_n = hpx::get_num_localities(hpx::launch::sync);
         const std::int64_t rank_me = rel_rank;
         const bool post_lleaf = left < rank_n;
         const bool post_rleaf = right < rank_n;
@@ -75,7 +77,7 @@ public:
             if(post_lleaf) {
                 hpx::async(
                     left,
-                    [](distributed_object< std::tuple<std::int32_t, std::string> > & args_, std::string data_) {
+                    [](distributed_object<broadcast_tuple_type> & args_, std::string data_) {
                         std::get<1>(*args_).resize(data_.size());
                         std::get<1>(*args_).insert(0, data_);
                         atomic_xchange( &std::get<0>(*args_), 0, 1 );
@@ -85,7 +87,7 @@ public:
             if(post_rleaf) {
                 hpx::async(
                     right,
-                    [](distributed_object< std::tuple<std::int32_t, std::string> > & args_, std::string data_) {
+                    [](distributed_object<broadcast_tuple_type> & args_, std::string data_) {
                         std::get<1>(*args_).resize(data_.size());
                         std::get<1>(*args_).insert(0, data_);
                         atomic_xchange( &std::get<0>(*args_), 0, 1 );
@@ -101,7 +103,7 @@ public:
             if(post_lleaf) {
                 hpx::async(
                     left,
-                    [](distributed_object< std::tuple<std::int32_t, std::string> > & args_, std::string data_) {
+                    [](distributed_object<broadcast_tuple_type> & args_, std::string data_) {
                         std::get<1>(*args_).resize(data_.size());
                         std::get<1>(*args_).insert(0, data_);
                         atomic_xchange( &std::get<0>(*args_), 0, 1 );
@@ -111,7 +113,7 @@ public:
             if(post_rleaf) {
                 hpx::async(
                     right,
-                    [](distributed_object< std::tuple<std::int32_t, std::string> > & args_, std::string data_) {
+                    [](distributed_object<broadcast_tuple_type> & args_, std::string data_) {
                         std::get<1>(*args_).resize(data_.size());
                         std::get<1>(*args_).insert(0, data_);
                         atomic_xchange( &std::get<0>(*args_), 0, 1 );
@@ -127,7 +129,7 @@ public:
         }
 
         if constexpr(is_blocking<BlockingPolicy>()) {
-            hpx::lcos::barrier b("wait_for_completion", hpx::final_all_localities().size(), hpx::get_locality_id());
+            hpx::lcos::barrier b("wait_for_completion", hpx::get_num_localities(hpx::launch::sync), hpx::get_locality_id());
             b.wait(); // make sure communications terminate properly
         }
 

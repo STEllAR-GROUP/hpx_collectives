@@ -7,6 +7,8 @@
 #ifndef __HPX_COLLECTIVES_UTILS_H__
 #define __HPX_COLLECTIVES_UTILS_H__
 
+#include <algorithm>
+
 namespace hpx { namespace utils { namespace collectives { namespace utils {
 
 #define STRONG 0
@@ -42,7 +44,7 @@ static inline Type1 ipow(Type1 a, Type2 ex)
 }
 
 static inline int backoff(const int attempt, const int base, const int cap) {
-    return std::min(cap, ipow(base * 2, 2));
+    return (std::min)(cap, ipow(base * 2, 2));
 }
 
 } } } } // end namespace

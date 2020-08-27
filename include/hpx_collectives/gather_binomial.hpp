@@ -7,23 +7,22 @@
 #ifndef __HPX_GATHER_BINOMIAL_HPP__
 #define __HPX_GATHER_BINOMIAL_HPP__
 
+#include <cstdint>
+#include <iterator>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
-#include <iterator>
+#if defined(HPX_HAVE_UNISTD_H)
 #include <unistd.h>
+#endif
 
 #include <hpx/include/async.hpp>
-#include <hpx/lcos/barrier.hpp>
+#include <hpx/barrier.hpp>
 #include <hpx/lcos/distributed_object.hpp>
 
 #include "collective_traits.hpp"
 #include "gather.hpp"
 #include "serialization.hpp"
-
-using hpx::lcos::distributed_object;
-
-REGISTER_DISTRIBUTED_OBJECT_PART(std::tuple<std::int32_t, std::string>);
 
 namespace hpx { namespace utils { namespace collectives {
 
@@ -37,7 +36,7 @@ class gather< tree_binomial, BlockingPolicy, Serialization > {
 private:
     std::int64_t root;
     std::int64_t mask;
-    hpx::distributed_object< std::tuple< std::int32_t, std::vector<std::string> > > args;
+    hpx::lcos::distributed_object<binomial_gather_tuple_type> args;
 
 public:
     using communication_pattern = hpx::utils::collectives::tree_binomial;
@@ -55,7 +54,7 @@ public:
         //
         using value_type = typename std::iterator_traits<InputIterator>::value_type;
 
-        const auto rank_n = hpx::final_all_localities().size();
+        const auto rank_n = hpx::get_num_localities(hpx::launch::sync);
         const auto block_size = static_cast<std::int64_t>(input_end - input_beg) /
             static_cast<std::int64_t>(rank_n);
 
@@ -100,7 +99,7 @@ public:
 
                 hpx::async(
                     parent,
-                    [](hpx::distributed_object< std::tuple< std::int32_t, std::vector<std::string> > > & args_, std::vector<std::string> data_) {
+                    [](hpx::lcos::distributed_object<binomial_gather_tuple_type> & args_, std::vector<std::string> data_) {
                         std::get<1>(*args_).reserve(std::get<1>(*args_).size() + data_.size());
                         std::get<1>(*args_).insert(std::get<1>(*args_).end(), data_.begin(), data_.end());
                         atomic_xchange( &std::get<0>(*args_), 0, 1 );
@@ -115,7 +114,7 @@ public:
             // potentially deadlock on a PE
             //
             {
-                hpx::lcos::barrier b("wait_for_completion", hpx::final_all_localities().size(), hpx::get_locality_id());
+                hpx::lcos::barrier b("wait_for_completion", hpx::get_num_localities(hpx::launch::sync), hpx::get_locality_id());
                 b.wait(); // make sure communications terminate properly
             }
         }
@@ -137,7 +136,7 @@ public:
         }
 
         if constexpr(is_blocking<BlockingPolicy>()) {
-            hpx::lcos::barrier b("wait_for_completion", hpx::final_all_localities().size(), hpx::get_locality_id());
+            hpx::lcos::barrier b("wait_for_completion", hpx::get_num_localities(hpx::launch::sync), hpx::get_locality_id());
             b.wait(); // make sure communications terminate properly
         }
 

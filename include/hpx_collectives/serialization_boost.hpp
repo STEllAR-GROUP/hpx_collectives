@@ -40,7 +40,7 @@ struct is_boost : public std::false_type {
 };
 
 template<>
-struct is_boost<hpx::utils::collectives::serialization::boost> : public std::true_type {
+struct is_boost< ::hpx::utils::collectives::serialization::boost> : public std::true_type {
 };
 
 } } } } // end namespaces

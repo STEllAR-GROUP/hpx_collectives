@@ -40,7 +40,7 @@ struct is_hpx : public std::false_type {
 };
 
 template<>
-struct is_hpx<hpx::utils::collectives::serialization::hpx> : public std::true_type {
+struct is_hpx< ::hpx::utils::collectives::serialization::hpx> : public std::true_type {
 };
 
 } } } } // end namespaces
